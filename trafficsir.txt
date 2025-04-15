@@ -1,0 +1,34 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity traffic_light is
+    port (
+        clk   : in std_logic;
+        reset : in std_logic;
+        light : out std_logic_vector(2 downto 0)  -- R (bit 2), Y (bit 1), G (bit 0)
+    );
+end traffic_light;
+
+architecture simple of traffic_light is
+    type state_type is (R, G, Y);
+    signal state : state_type := R;
+begin
+    process(clk, reset)
+    begin
+        if reset = '1' then
+            state <= R;
+        elsif rising_edge(clk) then
+            case state is
+                when R => state <= G;
+                when G => state <= Y;
+                when Y => state <= R;
+            end case;
+        end if;
+    end process;
+
+    -- Output logic based on current state
+    with state select
+        light <= "100" when R,  -- Red light ON
+                 "001" when G,  -- Green light ON
+                 "010" when Y;  -- Yellow light ON
+end simple;
